@@ -1,73 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const checkAuth = require('../middleware/check-auth');
+const UserControllers = require('../controllers/users');
 
 const User = require('../models/user');
 
-router.post('/signup', (req, res, next) => {
-    User.find({ email: req.body.email }).exec().then(user => {
-        if (user.length >= 1) {
-            // conflict 409 / 422
-            return res.status(409).json({
-                message: 'Mail exists'
-            });
-        } else {
-            bcrypt.hash(req.body.password, 10, (err, hash) => {
-                if (err) {
-                    return res.status(500).json({
-                        error: err
-                    });
-                } else {
-                    const user = new User(
-                        {
-                            _id: new mongoose.Types.ObjectId(),
-                            email: req.body.email,
-                            password: hash
-                        }
-                    );
-                    user.save()
-                        .then(result => {
-                            console.log(result);
-                            res.status(201).json({
-                                message: 'User created'
-                            });
-                        })
-                        .catch(err => {
-                            console.log(err);
-                            res.status(500).json({
-                                error: err
-                            });
-                        });
-                }
-            });
-        }
-    });
-});
+// SIGN UP
 
-router.delete('/delete/:userId', (req, res, next) => {
-    User.remove({
-        _id: req.params.userId
-    }). exec()
-    .then( result => {
-        res.status(200).json({
-            message: 'User deleted'
-        })
-    })
-    .catch(
-        err => {
-            console.log(err);
-            res.status(500).json({
-                error: err
-            });
-        }
-    );
-})
+router.post('/signup', UserControllers.user_signup);
+
+// LOGIN
+
+router.post('/login', UserControllers.user_login);
+
+// DELETE USER
+
+router.delete('/delete/:userId', checkAuth, UserControllers.user_delete);
+
+// GET ALL USERS
+
+router.get('/', checkAuth, UserControllers.user_get_all);
 
 module.exports = router;
-
-
-// {
-// 	"email": "test@test.com",
-// 	"password": "test"
-// }
