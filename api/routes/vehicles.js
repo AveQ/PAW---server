@@ -8,12 +8,12 @@ const storage = multer.diskStorage({
         cb(null, './uploads/');
     },
     filename: function (req, file, cb) {
-        cb(null, file.originalname);
+        cb(null, Date.now() + file.originalname);
     }
 });
 
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype === 'image/jpep' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' ) {
         cb(null, true);
     } else {
         cb(null, false);
@@ -32,15 +32,12 @@ router.get('/', (req, res, next) => {
     Vehicle.find()
         .select('_id brand model price mileage capacity horsepower ' +
             'acceleration year manual multifunction ventilatedSeats heatedSeats navigation ' +
-            'airConditioning sunroof bixenons xenon')
+            'airConditioning sunroof bixenons xenon image')
         .exec()
         .then(
             docs => {
-                const response = {
-                    count: docs.length,
-                    vehicle: docs
-                }
-                res.status(200).json(response);
+               
+                res.status(200).json(docs);
             })
         .catch(
             err => {
@@ -49,45 +46,6 @@ router.get('/', (req, res, next) => {
             }
         );
 });
-
-// POST 
-// router.post('/', (req,res,next) => {
-
-//     const vehicle = new Vehicle({
-//         _id: new mongoose.Types.ObjectId(),
-//         brand: req.body.brand,
-//         model: req.body.model,
-//         price: req.body.price,
-//         mileage: req.body.mileage,
-//         capacity: req.body.capacity,
-//         horsepower: req.body.horsepower,
-//         acceleration: req.body.acceleration,
-//         year: req.body.year,
-//         manual: req.body.manual,
-//         multifunction: req.body.multifunction,
-//         ventilatedSeats: req.body.ventilatedSeats,
-//         heatedSeats: req.body.heatedSeats,
-//         navigation: req.body.navigation,
-//         airConditioning: req.body.airConditioning,
-//         sunroof: req.body.sunroof,
-//         bixenons: req.body.bixenons,
-//         xenon: req.body.xenon
-//     });
-//     vehicle
-//         .save()
-//         .then(result => {
-//         console.log(result);
-//         res.status(200).json({
-//             vehicle: result
-//         })
-//     })
-//     .catch(err => {
-//         console.log(err);
-//         res.status(500).json({
-//             error: err
-//         })
-//     });
-// });
 
 // GET :ID
 router.get('/:vehicleId', (req, res, next) => {
@@ -108,7 +66,7 @@ router.get('/:vehicleId', (req, res, next) => {
         });
 });
 
-router.post('/', upload.single('avatar'), (req, res, next) => {
+router.post('/', upload.single('image'), (req, res, next) => {
     console.log(req.file);
     const vehicle = new Vehicle({
         _id: new mongoose.Types.ObjectId(),
@@ -128,7 +86,8 @@ router.post('/', upload.single('avatar'), (req, res, next) => {
         airConditioning: req.body.airConditioning,
         sunroof: req.body.sunroof,
         bixenons: req.body.bixenons,
-        xenon: req.body.xenon
+        xenon: req.body.xenon,
+        image: req.file.path
     });
     vehicle
         .save()
@@ -166,7 +125,6 @@ router.get('/:vehicleId', (req, res, next) => {
 });
 
 // DELETE
-
 router.delete("/:vehicleId", (req, res, next) => {
     const id = req.params.vehicleId;
     Vehicle.remove({ _id: id })
@@ -209,22 +167,25 @@ router.patch("/:vehicleId", (req, res, next) => {
 module.exports = router;
 
 
-// {
-//     "brand": "BMW",
-//     "model": "BMW222",
-//     "price": 222222,
-//     "mileage": 324432,
-//     "capacity": 4444,
-//     "horsepower": 432,
-//     "acceleration": 4,
-//     "year": 2015,
-//     "manual": true,
-//     "multifunction": true,
-//     "ventilatedSeats": true,
-//     "heatedSeats": true,
-//     "navigation": true,
-//     "airConditioning": true,
-//     "sunroof": true,
-//     "bixenons": true,
-//     "xenon": true
-// }
+/*
+
+"brand": "BMW",
+  "model": "F30",
+  "price": 300,
+  "mileage": 13000,
+  "capacity": 3000,
+  "horsepower": 300,
+  "acceleration": 3,
+  "year": 2019,
+  "manual": false,
+  "multifunction": true,
+  "ventilatedSeats": false,
+  "heatedSeats": true,
+  "navigation": false,
+  "airConditioning": true,
+  "sunroof": true,
+  "bixenons": false,
+  "xenon": true,
+  "image": "C:\\Users\\marti\\Postman\\files\\audi-a5-1",
+  "compare": true
+  */

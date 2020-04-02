@@ -18,7 +18,8 @@ const vehicleSchema = mongoose.Schema({
     airConditioning: {type: Boolean, required: true},
     sunroof: {type: Boolean, required: true},
     bixenons: {type: Boolean, required: true},
-    xenon: {type: Boolean, required: true}
+    xenon: {type: Boolean, required: true},
+    image: { type: String, require: true}
 });
 
 module.exports = mongoose.model('Vehicle', vehicleSchema);
