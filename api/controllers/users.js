@@ -30,8 +30,12 @@ exports.user_login = (req, res, next) => {
                             expiresIn: "1h"
                         });
                     return res.status(200).json({
-                        message: 'Auth successful',
-                        token: token
+                        id: user[0]._id,
+                        email: req.body.email,
+                        token: token,
+                        expirationDate: 3600,
+                        isAdmin: user[0].isAdmin,
+                        historyId: user[0].historyId
                     });
                 }
                 return res.status(401).json({
@@ -68,7 +72,9 @@ exports.user_signup = (req, res, next) => {
                         {
                             _id: new mongoose.Types.ObjectId(),
                             email: req.body.email,
-                            password: hash
+                            password: hash,
+                            isAdmin: 'USER',
+                            historyId: ''
                         }
                     );
                     user.save()
@@ -90,32 +96,39 @@ exports.user_signup = (req, res, next) => {
     });
 };
 
-// DELETE
+// DELETE !== '5e86e1b037f73719c8057b1b'
 
 exports.user_delete = (req, res, next) => {
-    User.remove({
-        _id: req.params.userId
-    }).exec()
-        .then(result => {
-            res.status(200).json({
-                message: 'User deleted'
+    if(req.params.userId !== '5e86e49eae2e623a48346549') {
+        User.remove({
+            _id: req.params.userId
+        }).exec()
+            .then(result => {                
+                res.status(200).json({
+                    message: 'Delete success'
+                });           
             })
-        })
-        .catch(
-            err => {
-                console.log(err);
-                res.status(500).json({
-                    error: err
-                });
-            }
-        );
+            .catch(
+                err => {
+                    console.log(err);
+                    res.status(500).json({
+                        error: err
+                    });
+                }
+            );
+    } else {
+        res.status(409).json({
+            error: 'Illegal ID!'
+        });
+    }
+    
 };
 
 // GET ALL USERS
 
 exports.user_get_all = (req, res, next) => {
     User.find()
-        .select('_id email')
+        .select('_id email isAdmin historyId')
         .exec()
         .then(users => {
             res.status(200).json(
@@ -126,3 +139,43 @@ exports.user_get_all = (req, res, next) => {
             res.status(500).json({ error: err });
         });
 };
+
+// GET ONE USER
+exports.users_get_user = (req, res, next) => {
+    const id = req.params.userId;
+    User.findById(id)
+        .exec()
+        .then(doc => {
+            console.log(doc);
+            if (doc) {
+                res.status(200).json(doc);
+            } else {
+                res.status(404).json({ message: 'No valid entry found for provided ID' })
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: err });
+        });
+};
+
+// PATCH USER 
+exports.users_modify_user = (req, res, next) => {
+    const id = req.params.userId;
+    const updateOps = {};
+    for (const ops of req.body) {
+        updateOps[ops.propName] = ops.value
+    }
+    User.update({ _id: id }, { $set: updateOps })
+        .exec()
+        .then(result => {
+            console.log(result);
+            res.status(200).json(result);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
+}

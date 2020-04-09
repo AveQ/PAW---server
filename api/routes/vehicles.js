@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const checkAuth = require('../middleware/check-auth');
+const checkAuthGuest = require('../middleware/check-auth');
+const paginatedResults = require('../middleware/paginatedResults');
 const VehicleController = require('../controllers/vehicles');
 
 const storage = multer.diskStorage({
@@ -27,15 +29,18 @@ const upload = multer({ storage: storage });
 
 router.get('/', VehicleController.vehicles_get_all);
 
+// GET PAGINATION
+
+router.get('/xd', VehicleController.vehicle_get_part);
+
 // GET :ID
 router.get('/:vehicleId', VehicleController.vehicles_get_vehicle);
 
 // POST
-
 router.post('/', checkAuth, upload.single('image'), VehicleController.vehicles_create_vehicle);
 
 // DELETE
-router.delete("/:vehicleId", VehicleController.vehicles_delete_vehicle);
+router.delete("/:vehicleId", checkAuth, VehicleController.vehicles_delete_vehicle);
 
 // PATCH
 router.patch("/:vehicleId", VehicleController.vehicles_modify_vehicle);

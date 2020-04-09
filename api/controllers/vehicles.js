@@ -1,18 +1,37 @@
 const Vehicle = require('../models/vehicle');
 const mongoose = require('mongoose');
 
-// GET
+// GET ALL
 
 exports.vehicles_get_all = (req, res, next) => {
+    const page = parseInt(req.query.page);
+    const limit = req.query.limit;
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const results = {};
     Vehicle.find()
         .select('_id brand model price mileage capacity horsepower ' +
             'acceleration year manual multifunction ventilatedSeats heatedSeats navigation ' +
-            'airConditioning sunroof bixenons xenon image')
+            'airConditioning sunroof bixenons xenon historyId image')
         .exec()
         .then(
-            docs => {
-               
-                res.status(200).json(docs);
+            docs => {          
+                if (endIndex < docs.length){
+                    results.next = {
+                        page: page + 1,
+                        limit: limit
+                    }
+                }           
+                if( startIndex > 0 ){
+                    results.previous = {
+                        page: page - 1,
+                        limit: limit
+                    }
+                }
+                results.results = docs.slice(startIndex, endIndex);     
+                res.status(200).json(results);
             })
         .catch(
             err => {
@@ -21,6 +40,49 @@ exports.vehicles_get_all = (req, res, next) => {
             }
         );
 };
+
+// GET ALL PAGINATED
+
+exports.vehicle_get_part = (req, res, next) => {
+    const page = parseInt(req.query.page);
+    const limit = req.query.limit;
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const results = {};
+
+    
+    
+    Vehicle.find()
+        .select('_id brand model price mileage capacity horsepower ' +
+            'acceleration year manual multifunction ventilatedSeats heatedSeats navigation ' +
+            'airConditioning sunroof bixenons xenon historyId image')
+        .exec()
+        .then(
+            docs => {          
+                if (endIndex < docs.length){
+                    results.next = {
+                        page: page + 1,
+                        limit: limit
+                    }
+                }           
+                if( startIndex > 0 ){
+                    results.previous = {
+                        page: page - 1,
+                        limit: limit
+                    }
+                }
+                results.results = docs.slice(startIndex, endIndex);     
+                res.status(200).json(results);
+            })
+        .catch(
+            err => {
+                console.log(err);
+                res.status(500).json({ error: err });
+            }
+        );
+}
 
 // POST
 
@@ -45,7 +107,9 @@ exports.vehicles_create_vehicle = (req, res, next) => {
         sunroof: req.body.sunroof,
         bixenons: req.body.bixenons,
         xenon: req.body.xenon,
+        historyId: '',
         image: req.file.path
+        
     });
     vehicle
         .save()

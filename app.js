@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const vehicleRoutes = require('./api/routes/vehicles')
 const userRoutes = require('./api/routes/user');
+const historyRoutes = require('./api/routes/history');
 
 
 var allowedOrigins = ['http://localhost:3001',
@@ -57,6 +58,7 @@ app.use((req,res,next) => {
 // routes
 app.use('/vehicles', vehicleRoutes);
 app.use('/user', userRoutes);
+app.use('/history', historyRoutes);
 
 
 //handling errors

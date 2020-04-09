@@ -21,4 +21,18 @@ router.delete('/delete/:userId', checkAuth, UserControllers.user_delete);
 
 router.get('/', checkAuth, UserControllers.user_get_all);
 
+// GET ONE USER
+
+router.get('/:userId', UserControllers.users_get_user);
+
+// PATCH USER
+
+router.patch('/:userId',  UserControllers.users_modify_user);
+
 module.exports = router;
+
+
+
+
+
+//checkAuth,
