@@ -43,15 +43,7 @@ exports.vehicles_get_all = (req, res, next) => {
 
 // GET ALL PAGINATED
 
-exports.vehicle_get_part = (req, res, next) => {
-    const page = parseInt(req.query.page);
-    const limit = req.query.limit;
-
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-
-    const results = {};
-
+exports.vehicles_get_allWithout = (req, res, next) => {
     
     
     Vehicle.find()
@@ -60,21 +52,8 @@ exports.vehicle_get_part = (req, res, next) => {
             'airConditioning sunroof bixenons xenon historyId image')
         .exec()
         .then(
-            docs => {          
-                if (endIndex < docs.length){
-                    results.next = {
-                        page: page + 1,
-                        limit: limit
-                    }
-                }           
-                if( startIndex > 0 ){
-                    results.previous = {
-                        page: page - 1,
-                        limit: limit
-                    }
-                }
-                results.results = docs.slice(startIndex, endIndex);     
-                res.status(200).json(results);
+            docs => {             
+                res.status(200).json(docs);
             })
         .catch(
             err => {

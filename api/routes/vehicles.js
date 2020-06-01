@@ -29,9 +29,9 @@ const upload = multer({ storage: storage });
 
 router.get('/', VehicleController.vehicles_get_all);
 
-// GET PAGINATION
+// GET Without PAGINATION
 
-router.get('/xd', VehicleController.vehicle_get_part);
+router.get('/all', VehicleController.vehicles_get_allWithout);
 
 // GET :ID
 router.get('/:vehicleId', VehicleController.vehicles_get_vehicle);

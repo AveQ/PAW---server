@@ -13,9 +13,9 @@ router.post('/signup', UserControllers.user_signup);
 
 router.post('/login', UserControllers.user_login);
 
-// DELETE USER
+// DELETE USER TODO: change endpoint
 
-router.delete('/delete/:userId', checkAuth, UserControllers.user_delete);
+router.delete('/:userId', checkAuth, UserControllers.user_delete);
 
 // GET ALL USERS
 
